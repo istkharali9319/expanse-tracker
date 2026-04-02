@@ -4,7 +4,7 @@ A full-stack web application built with **Python**, **FastAPI**, and **MySQL** f
 
 ## GitHub Repository
 
-[https://github.com/istkharali9319/pdf-link-validator.git](https://github.com/istkharali9319/pdf-link-validator.git)
+[https://github.com/istkharali9319/expanse-tracker](https://github.com/istkharali9319/expanse-tracker)
 
 ## Live Demo
 
@@ -77,7 +77,7 @@ expanse-tracker/
 
 ```bash
 # Clone the repository
-git clone https://github.com/istkharali9319/pdf-link-validator.git
+git clone https://github.com/istkharali9319/expanse-tracker.git
 cd expanse-tracker
 
 # Copy env file and update credentials
@@ -97,7 +97,7 @@ Open **http://localhost:8000**
 
 ```bash
 # Clone the repository
-git clone https://github.com/istkharali9319/pdf-link-validator.git
+git clone https://github.com/istkharali9319/expanse-tracker.git
 cd expanse-tracker
 
 # Create virtual environment
