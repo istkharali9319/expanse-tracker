@@ -7,10 +7,10 @@ services:
     container_name: expense_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: Root@1234
-      MYSQL_DATABASE: expense_manager
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
-      - "3307:3306"
+      - "${DB_PORT}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -24,10 +24,10 @@ services:
     container_name: expense_app
     restart: always
     ports:
-      - "8000:8000"
+      - "${APP_PORT}:8000"
     environment:
-      DATABASE_URL: mysql+pymysql://root:Root%401234@db/expense_manager
-      SECRET_KEY: expense-manager-secret-key-2026
+      DATABASE_URL: ${DATABASE_URL}
+      SECRET_KEY: ${SECRET_KEY}
     depends_on:
       db:
         condition: service_healthy
