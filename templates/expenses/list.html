@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% set active_page = "expenses" %}
+
+{% block title %}Expenses — Expense Manager{% endblock %}
+{% block page_title %}Expenses{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<div class="page-breadcrumb">
+    <a href="/dashboard"><i class="fa-solid fa-house me-1"></i>Home</a>
+    <span class="mx-2">/</span>
+    <span style="color:#2d3748;">Expenses</span>
+</div>
+
+<!-- Flash Messages -->
+{% if msg %}
+<div class="alert alert-success d-flex align-items-center gap-2 mb-4" role="alert">
+    <i class="fa-solid fa-circle-check"></i>
+    {{ msg }}
+</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    {{ error }}
+</div>
+{% endif %}
+
+<!-- ── Header Row ──────────────────────────────────────────── -->
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h5 style="font-weight:700; color:#1a202c; margin:0;">All Expenses</h5>
+        <p style="color:#718096; font-size:0.85rem; margin:0;">{{ expenses|length }} total record{% if expenses|length != 1 %}s{% endif %}</p>
+    </div>
+    <a href="/expenses/add" class="btn btn-primary">
+        <i class="fa-solid fa-plus me-2"></i>Add Expense
+    </a>
+</div>
+
+<!-- ── Expenses Table ──────────────────────────────────────── -->
+<div class="card card-table">
+    <div class="card-body p-0">
+        {% if expenses %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td style="color:#a0aec0; font-size:0.82rem;">{{ loop.index }}</td>
+                        <td>
+                            <span style="font-weight:600; color:#2d3748;">{{ expense.title }}</span>
+                        </td>
+                        <td class="amount-cell">${{ "%.2f"|format(expense.amount) }}</td>
+                        <td>
+                            <span class="badge-category cat-{{ expense.category.lower() }}">
+                                {{ expense.category }}
+                            </span>
+                        </td>
+                        <td style="color:#718096; white-space:nowrap;">{{ expense.date.strftime("%b %d, %Y") }}</td>
+                        <td style="color:#a0aec0; font-size:0.85rem; max-width:200px;">
+                            {% if expense.description %}
+                                {{ expense.description[:60] }}{% if expense.description|length > 60 %}...{% endif %}
+                            {% else %}
+                                <span style="color:#e2e8f0;">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center" style="white-space:nowrap;">
+                            <a href="/expenses/edit/{{ expense.id }}" class="btn btn-sm btn-warning me-1" title="Edit">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-danger"
+                                title="Delete"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal"
+                                data-id="{{ expense.id }}"
+                                data-title="{{ expense.title }}"
+                            >
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-receipt" style="color:#e2e8f0;"></i>
+            <p>No expenses found. Start tracking your spending!</p>
+            <a href="/expenses/add" class="btn btn-primary">
+                <i class="fa-solid fa-plus me-2"></i>Add Your First Expense
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ── Delete Confirmation Modal ──────────────────────────── -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fa-solid fa-triangle-exclamation me-2" style="color:#f56565;"></i>
+                    Confirm Delete
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <p style="color:#4a5568; margin:0;">
+                    Are you sure you want to delete the expense
+                    <strong id="deleteExpenseName" style="color:#1a202c;"></strong>?
+                    This action cannot be undone.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-xmark me-1"></i>Cancel
+                </button>
+                <form id="deleteForm" method="post" action="">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fa-solid fa-trash-can me-1"></i>Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.getElementById('deleteModal').addEventListener('show.bs.modal', function (event) {
+    const btn = event.relatedTarget;
+    const expenseId = btn.getAttribute('data-id');
+    const expenseTitle = btn.getAttribute('data-title');
+    document.getElementById('deleteExpenseName').textContent = '"' + expenseTitle + '"';
+    document.getElementById('deleteForm').action = '/expenses/delete/' + expenseId;
+});
+</script>
+{% endblock %}

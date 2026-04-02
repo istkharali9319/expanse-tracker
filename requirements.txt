@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pymysql
+python-dotenv
+jinja2
+python-multipart
+passlib[bcrypt]
+itsdangerous
+cryptography

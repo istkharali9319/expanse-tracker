@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% set active_page = "expenses" %}
+
+{% block title %}Edit Expense — Expense Manager{% endblock %}
+{% block page_title %}Edit Expense{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<div class="page-breadcrumb">
+    <a href="/dashboard"><i class="fa-solid fa-house me-1"></i>Home</a>
+    <span class="mx-2">/</span>
+    <a href="/expenses">Expenses</a>
+    <span class="mx-2">/</span>
+    <span style="color:#2d3748;">Edit</span>
+</div>
+
+<!-- Flash Messages -->
+{% if error %}
+<div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    {{ error }}
+</div>
+{% endif %}
+
+<div class="form-card">
+    <div class="mb-4 pb-3" style="border-bottom: 1px solid #f0f2f5;">
+        <h5 style="font-weight:700; color:#1a202c; margin:0;">
+            <i class="fa-solid fa-pen-to-square me-2" style="color:#ed8936;"></i>Edit Expense
+        </h5>
+        <p style="color:#718096; font-size:0.85rem; margin:4px 0 0;">
+            Update the details for <strong style="color:#2d3748;">{{ expense.title }}</strong>
+        </p>
+    </div>
+
+    <form action="/expenses/edit/{{ expense.id }}" method="post">
+
+        <!-- Title -->
+        <div class="mb-4">
+            <label for="title" class="form-label">
+                <i class="fa-solid fa-tag me-1" style="color:#718096;"></i>Title <span style="color:#e53e3e;">*</span>
+            </label>
+            <input
+                type="text"
+                class="form-control"
+                id="title"
+                name="title"
+                value="{{ expense.title }}"
+                required
+                maxlength="200"
+            >
+        </div>
+
+        <!-- Amount + Category Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label for="amount" class="form-label">
+                    <i class="fa-solid fa-dollar-sign me-1" style="color:#718096;"></i>Amount <span style="color:#e53e3e;">*</span>
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text" style="background:#f8fafc; border:1.5px solid #e2e8f0; border-right:none; border-radius:10px 0 0 10px; color:#718096;">$</span>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="amount"
+                        name="amount"
+                        value="{{ expense.amount }}"
+                        step="0.01"
+                        min="0.01"
+                        required
+                        style="border-left:none; border-radius:0 10px 10px 0;"
+                    >
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label for="category" class="form-label">
+                    <i class="fa-solid fa-layer-group me-1" style="color:#718096;"></i>Category <span style="color:#e53e3e;">*</span>
+                </label>
+                <select class="form-select" id="category" name="category" required>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}" {% if cat == expense.category %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Date -->
+        <div class="mb-4">
+            <label for="expense_date" class="form-label">
+                <i class="fa-solid fa-calendar-days me-1" style="color:#718096;"></i>Date <span style="color:#e53e3e;">*</span>
+            </label>
+            <input
+                type="date"
+                class="form-control"
+                id="expense_date"
+                name="expense_date"
+                value="{{ expense.date.isoformat() }}"
+                required
+            >
+        </div>
+
+        <!-- Description -->
+        <div class="mb-4">
+            <label for="description" class="form-label">
+                <i class="fa-solid fa-align-left me-1" style="color:#718096;"></i>Description
+                <span style="color:#a0aec0; font-weight:400;">(optional)</span>
+            </label>
+            <textarea
+                class="form-control"
+                id="description"
+                name="description"
+                rows="3"
+                placeholder="Add any notes or details..."
+            >{{ expense.description or "" }}</textarea>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk me-2"></i>Update Expense
+            </button>
+            <a href="/expenses" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-xmark me-2"></i>Cancel
+            </a>
+        </div>
+
+    </form>
+</div>
+
+<!-- Danger Zone -->
+<div class="mt-4 p-3" style="background:rgba(245,101,101,0.06); border:1px solid rgba(245,101,101,0.2); border-radius:12px; max-width:680px;">
+    <div class="d-flex align-items-center justify-content-between">
+        <div>
+            <strong style="color:#c53030; font-size:0.9rem;">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i>Danger Zone
+            </strong>
+            <div style="color:#718096; font-size:0.82rem; margin-top:2px;">Permanently delete this expense record</div>
+        </div>
+        <button
+            type="button"
+            class="btn btn-sm btn-danger"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteModal"
+        >
+            <i class="fa-solid fa-trash-can me-1"></i>Delete
+        </button>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa-solid fa-triangle-exclamation me-2" style="color:#f56565;"></i>Confirm Delete
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding:24px;">
+                <p style="color:#4a5568; margin:0;">
+                    Are you sure you want to delete
+                    <strong style="color:#1a202c;">"{{ expense.title }}"</strong>?
+                    This action cannot be undone.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="/expenses/delete/{{ expense.id }}" method="post">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fa-solid fa-trash-can me-1"></i>Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

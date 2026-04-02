@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% set active_page = "expenses" %}
+
+{% block title %}Add Expense — Expense Manager{% endblock %}
+{% block page_title %}Add Expense{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<div class="page-breadcrumb">
+    <a href="/dashboard"><i class="fa-solid fa-house me-1"></i>Home</a>
+    <span class="mx-2">/</span>
+    <a href="/expenses">Expenses</a>
+    <span class="mx-2">/</span>
+    <span style="color:#2d3748;">Add New</span>
+</div>
+
+<!-- Flash Messages -->
+{% if error %}
+<div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    {{ error }}
+</div>
+{% endif %}
+
+<div class="form-card">
+    <div class="mb-4 pb-3" style="border-bottom: 1px solid #f0f2f5;">
+        <h5 style="font-weight:700; color:#1a202c; margin:0;">
+            <i class="fa-solid fa-plus-circle me-2" style="color:#667eea;"></i>New Expense
+        </h5>
+        <p style="color:#718096; font-size:0.85rem; margin:4px 0 0;">Fill in the details below to record a new expense.</p>
+    </div>
+
+    <form action="/expenses/add" method="post">
+
+        <!-- Title -->
+        <div class="mb-4">
+            <label for="title" class="form-label">
+                <i class="fa-solid fa-tag me-1" style="color:#718096;"></i>Title <span style="color:#e53e3e;">*</span>
+            </label>
+            <input
+                type="text"
+                class="form-control"
+                id="title"
+                name="title"
+                placeholder="e.g. Grocery shopping at Walmart"
+                required
+                maxlength="200"
+            >
+        </div>
+
+        <!-- Amount + Category Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label for="amount" class="form-label">
+                    <i class="fa-solid fa-dollar-sign me-1" style="color:#718096;"></i>Amount <span style="color:#e53e3e;">*</span>
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text" style="background:#f8fafc; border:1.5px solid #e2e8f0; border-right:none; border-radius:10px 0 0 10px; color:#718096;">$</span>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="amount"
+                        name="amount"
+                        placeholder="0.00"
+                        step="0.01"
+                        min="0.01"
+                        required
+                        style="border-left:none; border-radius:0 10px 10px 0;"
+                    >
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label for="category" class="form-label">
+                    <i class="fa-solid fa-layer-group me-1" style="color:#718096;"></i>Category <span style="color:#e53e3e;">*</span>
+                </label>
+                <select class="form-select" id="category" name="category" required>
+                    <option value="" disabled selected>Select a category</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}">{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Date -->
+        <div class="mb-4">
+            <label for="expense_date" class="form-label">
+                <i class="fa-solid fa-calendar-days me-1" style="color:#718096;"></i>Date <span style="color:#e53e3e;">*</span>
+            </label>
+            <input
+                type="date"
+                class="form-control"
+                id="expense_date"
+                name="expense_date"
+                value="{{ today }}"
+                required
+            >
+        </div>
+
+        <!-- Description -->
+        <div class="mb-4">
+            <label for="description" class="form-label">
+                <i class="fa-solid fa-align-left me-1" style="color:#718096;"></i>Description
+                <span style="color:#a0aec0; font-weight:400;">(optional)</span>
+            </label>
+            <textarea
+                class="form-control"
+                id="description"
+                name="description"
+                placeholder="Add any notes or details about this expense..."
+                rows="3"
+            ></textarea>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-success">
+                <i class="fa-solid fa-floppy-disk me-2"></i>Save Expense
+            </button>
+            <a href="/expenses" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-xmark me-2"></i>Cancel
+            </a>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}

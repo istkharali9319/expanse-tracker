@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% set active_page = "dashboard" %}
+
+{% block title %}Dashboard — Expense Manager{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<div class="page-breadcrumb">
+    <i class="fa-solid fa-house me-1"></i>
+    <span>Home</span>
+    <span class="mx-2">/</span>
+    <span style="color:#2d3748;">Dashboard</span>
+</div>
+
+<!-- ── Stat Cards ──────────────────────────────────────────── -->
+<div class="row g-4 mb-4">
+
+    <!-- Monthly Total -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between">
+                <div>
+                    <div class="stat-label">{{ current_month_name }} Expenses</div>
+                    <div class="stat-value">${{ "%.2f"|format(monthly_total) }}</div>
+                    <div class="stat-sub">Current month spending</div>
+                </div>
+                <div class="stat-icon icon-blue">
+                    <i class="fa-solid fa-calendar-day"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yearly Total -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between">
+                <div>
+                    <div class="stat-label">{{ current_year }} Expenses</div>
+                    <div class="stat-value">${{ "%.2f"|format(yearly_total) }}</div>
+                    <div class="stat-sub">Annual total spending</div>
+                </div>
+                <div class="stat-icon icon-green">
+                    <i class="fa-solid fa-calendar"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Records -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between">
+                <div>
+                    <div class="stat-label">Total Records</div>
+                    <div class="stat-value">{{ total_count }}</div>
+                    <div class="stat-sub">Expense entries logged</div>
+                </div>
+                <div class="stat-icon icon-purple">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Add -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="d-flex align-items-start justify-content-between">
+                <div>
+                    <div class="stat-label" style="color:rgba(255,255,255,0.7);">Quick Action</div>
+                    <div class="stat-value" style="color:#fff; font-size:1.2rem;">Add Expense</div>
+                    <div class="stat-sub" style="color:rgba(255,255,255,0.6);">Record a new expense</div>
+                </div>
+                <div class="stat-icon" style="background:rgba(255,255,255,0.2); color:#fff;">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+            </div>
+            <a href="/expenses/add" class="stretched-link"></a>
+        </div>
+    </div>
+
+</div>
+
+<!-- ── Recent Expenses Table ───────────────────────────────── -->
+<div class="card card-table">
+    <div class="card-header">
+        <h5><i class="fa-solid fa-clock-rotate-left me-2" style="color:#4299e1;"></i>Recent Expenses</h5>
+        <a href="/expenses" class="btn btn-sm btn-primary">
+            <i class="fa-solid fa-eye me-1"></i>View All
+        </a>
+    </div>
+    <div class="card-body p-0">
+        {% if recent_expenses %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in recent_expenses %}
+                    <tr>
+                        <td>
+                            <div style="font-weight:600; color:#2d3748;">{{ expense.title }}</div>
+                            {% if expense.description %}
+                            <div style="font-size:0.78rem; color:#a0aec0;">{{ expense.description[:50] }}{% if expense.description|length > 50 %}...{% endif %}</div>
+                            {% endif %}
+                        </td>
+                        <td class="amount-cell">${{ "%.2f"|format(expense.amount) }}</td>
+                        <td>
+                            <span class="badge-category cat-{{ expense.category.lower() }}">
+                                {{ expense.category }}
+                            </span>
+                        </td>
+                        <td style="color:#718096;">{{ expense.date.strftime("%b %d, %Y") }}</td>
+                        <td>
+                            <a href="/expenses/edit/{{ expense.id }}" class="btn btn-sm btn-warning me-1">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-receipt" style="color:#e2e8f0;"></i>
+            <p>No expenses recorded yet.</p>
+            <a href="/expenses/add" class="btn btn-primary">
+                <i class="fa-solid fa-plus me-2"></i>Add Your First Expense
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
