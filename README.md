@@ -6,6 +6,12 @@ A full-stack web application built with **Python**, **FastAPI**, and **MySQL** f
 
 [https://github.com/istkharali9319/expanse-tracker](https://github.com/istkharali9319/expanse-tracker)
 
+## Screenshots
+
+![Login Page](static/screenshots/login.png)
+
+---
+
 ## Live Demo
 
 ```
