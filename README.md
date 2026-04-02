@@ -6,6 +6,12 @@ A full-stack web application built with **Python**, **FastAPI**, and **MySQL** f
 
 [https://github.com/istkharali9319/pdf-link-validator.git](https://github.com/istkharali9319/pdf-link-validator.git)
 
+## Live Demo
+
+```
+http://3.26.242.21:8000
+```
+
 ---
 
 ## Features
@@ -28,6 +34,9 @@ A full-stack web application built with **Python**, **FastAPI**, and **MySQL** f
 | Frontend   | Bootstrap 5, Jinja2 |
 | Auth       | Session cookies, bcrypt |
 | Container  | Docker, Docker Compose |
+| CI/CD      | GitHub Actions      |
+| Registry   | Docker Hub          |
+| Server     | AWS EC2 (Ubuntu 24.04) |
 
 ---
 
@@ -35,17 +44,23 @@ A full-stack web application built with **Python**, **FastAPI**, and **MySQL** f
 
 ```
 expanse-tracker/
-├── main.py              # App routes & logic
-├── auth.py              # Authentication helpers
-├── models.py            # Database models
-├── schemas.py           # Pydantic schemas
-├── database.py          # DB connection
-├── requirements.txt     # Python dependencies
-├── Dockerfile           # Docker image config
-├── docker-compose.yml   # Local development setup
-├── .dockerignore        # Docker ignore rules
-├── static/              # CSS, JS, images
-└── templates/           # HTML templates
+├── main.py                          # App routes & logic
+├── auth.py                          # Authentication helpers
+├── models.py                        # Database models
+├── schemas.py                       # Pydantic schemas
+├── database.py                      # DB connection
+├── requirements.txt                 # Python dependencies
+├── Dockerfile                       # Docker image config
+├── docker-compose.yml               # Local development setup
+├── docker-compose.prod.yml          # Production setup
+├── .env.example                     # Environment variables example
+├── .dockerignore                    # Docker ignore rules
+├── .gitignore                       # Git ignore rules
+├── .github/
+│   └── workflows/
+│       └── deploy.yml               # GitHub Actions CI/CD pipeline
+├── static/                          # CSS, JS, images
+└── templates/                       # HTML templates
     ├── login.html
     ├── dashboard.html
     └── expenses/
@@ -64,6 +79,9 @@ expanse-tracker/
 # Clone the repository
 git clone https://github.com/istkharali9319/pdf-link-validator.git
 cd expanse-tracker
+
+# Copy env file and update credentials
+cp .env.example .env
 
 # Start app + MySQL together
 docker compose up --build
@@ -107,8 +125,12 @@ python3 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 Create a `.env` file in the project root:
 
 ```env
-DATABASE_URL=mysql+pymysql://root:YOUR_PASSWORD@localhost/expense_manager
+DATABASE_URL=mysql+pymysql://root:YOUR_PASSWORD@db/expense_manager
 SECRET_KEY=your-secret-key-here
+MYSQL_ROOT_PASSWORD=your-mysql-password
+MYSQL_DATABASE=expense_manager
+APP_PORT=8000
+DB_PORT=3306
 ```
 
 > Never commit `.env` to Git. It is listed in `.gitignore`.
@@ -128,7 +150,7 @@ SECRET_KEY=your-secret-key-here
 ## Docker Commands
 
 ```bash
-# Build and start
+# Build and start locally
 docker compose up --build
 
 # Run in background
@@ -146,13 +168,66 @@ docker compose up --build
 
 ---
 
-## Deployment
+## CI/CD Pipeline
 
-This project is configured for CI/CD deployment on AWS EC2 using GitHub Actions.
+This project uses **GitHub Actions** for automated deployment to **AWS EC2**.
 
-- **CI/CD:** GitHub Actions
-- **Registry:** Docker Hub
-- **Server:** AWS EC2 (Ubuntu)
+### How It Works
+
+```
+Push code to main branch
+        ↓
+GitHub Actions triggers automatically
+        ↓
+Build Docker image
+        ↓
+Push image to Docker Hub (istkharali9319/expense-trackor)
+        ↓
+SSH into AWS EC2 server
+        ↓
+Copy docker-compose.prod.yml to EC2
+        ↓
+Pull latest Docker image
+        ↓
+Restart containers
+        ↓
+App live at http://3.26.242.21:8000
+```
+
+### Pipeline File
+
+Located at [.github/workflows/deploy.yml](.github/workflows/deploy.yml)
+
+### GitHub Secrets Required
+
+| Secret | Description |
+|--------|-------------|
+| `DOCKER_USERNAME` | Docker Hub username |
+| `DOCKER_PASSWORD` | Docker Hub access token |
+| `EC2_HOST` | AWS EC2 public IP address |
+| `EC2_USER` | EC2 SSH username (`ubuntu`) |
+| `EC2_SSH_KEY` | Contents of `.pem` private key file |
+
+### EC2 Server Setup
+
+- **Provider:** AWS EC2
+- **OS:** Ubuntu 24.04 LTS
+- **Instance:** t3.micro (Free tier)
+- **Docker:** v28.2.2
+- **Docker Compose:** v5.1.1
+
+### Production .env on EC2
+
+Create `/home/ubuntu/expense-trackor/.env` on EC2 with:
+
+```env
+DATABASE_URL=mysql+pymysql://root:YOUR_PASSWORD@db/expense_manager
+SECRET_KEY=your-secret-key-here
+MYSQL_ROOT_PASSWORD=your-mysql-password
+MYSQL_DATABASE=expense_manager
+APP_PORT=8000
+DB_PORT=3306
+```
 
 ---
 
